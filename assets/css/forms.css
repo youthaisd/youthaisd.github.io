@@ -29,3 +29,5 @@
 .privacy-content p{color:#43595e;margin:0}
 .form-footer a{text-underline-offset:3px}
 @media(max-width:850px){.membership-explainer,.join-form-layout{grid-template-columns:1fr;gap:20px}.join-form-note{max-width:700px}.three-links{grid-template-columns:1fr}}
+
+.privacy-short a,.reference-note a{color:#206c65;text-decoration:underline;text-underline-offset:3px}.reference-note{background:#e5efea;border-left:3px solid #54877f;padding:16px 18px;margin:26px 0;line-height:1.55;overflow-wrap:anywhere}.reference-note code{font-size:.9em;font-weight:700}.form-notice:empty,.form-actions button[hidden]{display:none}

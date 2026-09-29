@@ -37,14 +37,14 @@ export default {
     if (raw.website_confirm) return reply({ ok:true }); // honeypot: discard silently
     const form = String(raw.form || '');
     if (!tables[form] || raw.form_version !== forms[form].version) return reply({ error:'Unknown form version.' },400);
+    const { errors, payload } = submissionPayload(form,raw,raw.source);
+    if (Object.keys(errors).length) return reply({ error:'Please review the marked answers.', fields:Object.keys(errors) },422);
     const key = await rateKey(ip,salt,form);
     const { data: permitted, error: rateError } = await context.supabaseAdmin.rpc('consume_submission_rate',{p_rate_key:key});
     if (rateError) { console.error('Rate limit service failed'); return reply({ error:'Submission service is temporarily unavailable.' },503); }
     if (!permitted) return reply({ error:'Too many submissions. Please try again later.' },429);
-    const { errors, payload } = submissionPayload(form,raw,raw.source);
-    if (Object.keys(errors).length) return reply({ error:'Please review the marked answers.', fields:Object.keys(errors) },422);
-    const { error } = await context.supabaseAdmin.from(tables[form]).insert(payload);
+    const { data, error } = await context.supabaseAdmin.from(tables[form]).insert(payload).select('id').single();
     if (error) { console.error('Submission insert failed', error.code); return reply({ error:'Your response could not be saved. Please try again.' },503); }
-    return reply({ ok:true });
+    return reply({ ok:true, reference:data.id });
   }),
 };

@@ -196,11 +196,11 @@ async function advance() {
   if (Object.keys(checked.errors).length) { showNotice('Please review your answers before submitting.','error'); state.step = definition.steps.findIndex(step => step.fields.some(field => checked.errors[field.name])); render(); return; }
   state.busy = true; render(); showNotice('Sending your response…','info');
   try {
-    const response = await fetch(apiConfig.endpoint, { method:'POST', headers:{ 'Content-Type':'application/json', apikey:apiConfig.publishableKey }, body:JSON.stringify({ form:formName, ...checked.payload, website_confirm:wizard.elements.website_confirm.value }) });
+    const response = await fetch(apiConfig.endpoint, { method:'POST', headers:{ 'Content-Type':'application/json', apikey:apiConfig.publishableKey }, body:JSON.stringify({ form:formName, ...state.values, source, form_version:definition.version, website_confirm:wizard.elements.website_confirm.value }) });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || result.ok !== true) throw new Error(result.error || 'Your response could not be sent. Please try again.');
     sessionStorage.removeItem(storageKey);
-    sessionStorage.setItem(`aixsd:submitted:${formName}`,String(Date.now()));
+    sessionStorage.setItem(`aixsd:submitted:${formName}`,JSON.stringify({ timestamp:Date.now(), reference:result.reference }));
     emit(`${formName === 'projects' ? 'project' : formName === 'contribute' ? 'contributor' : 'consultation'}_completed`);
     location.href = 'success/';
   } catch (error) { showNotice(error.message || 'Your response could not be sent. Please try again.','error'); state.busy=false; render(); }

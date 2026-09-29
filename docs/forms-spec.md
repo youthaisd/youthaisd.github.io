@@ -2,7 +2,7 @@
 
 ## Status and deployment boundary
 
-The static pages are ready for preview. **They do not accept submissions until a Supabase project, database migration, Edge Function, allowed origin, rate-limit salt, and public API configuration are installed.** The browser never contains a secret key. The success pages show confirmation only after an accepted API response in the same browser tab.
+The LISTEN, MAP, and CONTRIBUTE forms and Supabase backend are deployed for live submissions. JOIN is a separate v0.2 route and remains closed; see [membership notes](membership-v02.md). The three forms are restricted to adults aged 18 or older. The browser contains only a publishable key; the success pages show confirmation and a deletion-request reference only after an accepted API response.
 
 Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `contribute/`, each with `success/` (and a `success.html` equivalent). All asset links are relative and work under a repository path.
 
@@ -15,7 +15,7 @@ Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `co
 - The five-step interface preserves values on Back. Drafts use `sessionStorage`, not `localStorage`, and are deleted after accepted submission.
 - Source is one of `direct`, `consultation`, `projects`, or `website`. It is a navigation source, not a person identifier. No cross-form ID, email matching, or fingerprinting is implemented.
 - Only six answer-free `CustomEvent` names are emitted by the browser: `consultation_started`, `consultation_completed`, `project_started`, `project_completed`, `contributor_started`, `contributor_completed`. They are not transmitted to analytics by this release.
-- No file uploads, public data explorer, membership application, partner application, or automatic scoring exist in the original three-form v1. JOIN membership is a separate v0.2 route; see [membership-v02.md](membership-v02.md).
+- No file uploads, public data explorer, membership application, partner application, or automatic scoring exist in v1.
 
 ## Tables and key fields
 
@@ -25,7 +25,7 @@ Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `co
 | MAP | `project_submissions` | `projects_v1.0` | project type/stage/region/topics/SDGs, problem, AI role, progress, links, needs, public-use permission | submitter name/email/organisation |
 | CONTRIBUTE | `contributor_interests` | `contribute_v1.0` | role, field, topics, contribution types, small first contribution, availability, profile links | preferred name/email |
 
-Each table also stores its own UUID, creation time, source, and form version. There is no shared `person_id`. The SQL migration revokes `anon` and `authenticated` access to all response tables and gives the service role only `SELECT` and `INSERT` for those tables. The Edge Function uses the admin client only on the server. Test database grants and RLS in the actual Supabase project before launch.
+Each table also stores its own UUID, creation time, source, form version, and adult confirmation. There is no shared `person_id`. The SQL migrations revoke `anon` and `authenticated` access to all response tables and grant the service role access for verified data requests. The Edge Function uses the admin client only on the server.
 
 ## Branching and validation
 
@@ -46,10 +46,10 @@ Client and server both use `data/validation.js`; the server validates again befo
 ## Privacy and abuse prevention
 
 - The Edge Function accepts only configured site origins and the project's publishable key, then validates content server-side. Origin and a public key are **not** proof of human identity; the honeypot and rate limit are additional friction.
-- A database-backed rate limiter permits five attempts per form per hour per gateway IP. It uses an HMAC hash that includes form and hour, so its security records cannot be used to link people across forms or hours. It stores no raw IP in research tables. Automatic hosting logs may still contain IPs; do not copy them into analysis exports.
+- A database-backed rate limiter permits five valid submissions per form per hour per gateway IP. It uses an HMAC hash that includes form and hour, so its security records cannot be used to link people across forms or hours. It stores no raw IP in research tables. Automatic hosting logs may still contain IPs; do not copy them into analysis exports.
 - `RATE_LIMIT_SALT` is a server secret. Set a long random value through Supabase Secrets. Never commit it.
 - The rate limit depends on a trustworthy gateway IP header. Confirm header behavior in the deployed environment. Add managed bot protection if spam volume warrants it.
-- The service does not implement data deletion, retention periods, or a named privacy contact because those policy decisions were not supplied. **Set and publish these before opening real submissions.** The public forms currently remain in preview mode until API settings are supplied.
+- The public [privacy notice](../privacy/) provides the contact, storage location, uses, withdrawal route, and 12-month retention policy. A scheduled database task removes expired responses daily. Submission references allow a respondent to identify an anonymous response for a verified deletion request.
 - Do not publish raw response tables, private email addresses, project submissions, or contributor records. Export clean CSV/JSON only through authorized database access for research analysis.
 - Public quotations from free-text responses require separate explicit permission, even when the published quote is anonymous.
 
@@ -61,12 +61,12 @@ For project mapping, summarize topics × stage, topics × needs, and stage × ne
 
 ## Launch checklist
 
-1. Create a Supabase project and apply `supabase/migrations/202609290001_forms_v1.sql`.
+1. Create a Supabase project and apply all migrations in `supabase/migrations/` in order.
 2. Link the project with the Supabase CLI, apply the migration (`supabase db push`), and deploy `supabase/functions/submit` (`supabase functions deploy submit`). `verify_jwt = false` is in `supabase/config.toml`; the function itself requires a valid publishable key.
 3. Set `PUBLIC_SITE_ORIGINS` (comma-separated exact origins, e.g. `https://example.org`) and `RATE_LIMIT_SALT` in Supabase Secrets. Verify gateway IP header behavior.
 4. Publish a privacy notice naming the responsible contact, storage location, retention period, withdrawal/deletion process, and intended research/publication use.
 5. In `assets/js/api-config.js`, set the public Edge Function URL and the Supabase **publishable** key. Never paste a secret/service-role key here.
 6. Test all three forms against the deployed function; confirm accepted rows land in different tables and direct `anon`/`authenticated` table reads are denied. Test negative cases, rate limit, and origin rejection.
-7. Only then remove preview wording from the homepage if needed and publish the static directory to GitHub Pages.
+7. Publish the static directory to GitHub Pages after the checks pass.
 
 Current [Supabase Edge Function auth](https://supabase.com/docs/guides/functions/auth), [CORS](https://supabase.com/docs/guides/functions/cors), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), and [API key](https://supabase.com/docs/guides/getting-started/api-keys) documentation informed the server setup.

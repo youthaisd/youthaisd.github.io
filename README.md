@@ -1,34 +1,24 @@
-# YouthAISD — website v0.2
+# YouthAISD — website v0.2 with Forms v1.0
 
-Static GitHub Pages site with LISTEN, MAP, JOIN and CONTRIBUTE pathways. The original three five-step forms remain separate from the new JOIN membership route. The site has no frontend build step.
-It uses system fonts and makes no third-party asset or analytics requests.
+Static GitHub Pages site with LISTEN, MAP, JOIN, and CONTRIBUTE routes. LISTEN, MAP, and CONTRIBUTE are open for adults aged 18 and older. JOIN remains a separate closed preview.
 
-## Deployment status
+## Deployment
 
-The site is published at <https://youthaisd.github.io/>. Supabase project
-`tzkdvvncvnttgjspzbot` has the v1.0 migration, `submit` Edge Function, allowed
-site origin, and rate-limit secret installed. Synthetic submissions to all three
-tables were verified and removed. Public clients cannot read or write response
-tables directly.
+- Site: <https://youthaisd.github.io/>
+- Privacy notice: <https://youthaisd.github.io/privacy/>
+- Supabase project: `tzkdvvncvnttgjspzbot` (Sydney)
+- Form responses: three separate private tables, 12-month retention with daily deletion
 
-The public forms remain **closed**. `assets/js/api-config.js` is blank
-until a contact address, retention period, privacy notice, and final live checks
-are ready. Its `formsOpen` flag must remain false until then. JOIN is also closed
-by default and has a separate function, migration, and public configuration gate.
-Do not turn on collection before those items are complete.
+The Edge Function validates requests, checks the allowed site origin, and rate limits valid submissions. The browser configuration contains only a publishable key. Never add a secret or service-role key to this repository. Each accepted submission receives a UUID reference for a later deletion request. Synthetic launch submissions were removed after verification.
+
+JOIN is separately gated by `assets/js/join-config.js` and its server settings. It must remain closed until its own privacy and deployment checks are completed.
 
 ## Local preview
 
-Serve this directory over HTTP (ES modules do not run correctly from `file://`). For example: `python -m http.server 8000`, then open `http://localhost:8000/`.
+Serve the directory over HTTP; ES modules do not run correctly from `file://`.
 
 ## GitHub Pages
 
-Copy the contents of this directory to the root of a GitHub repository. In **Settings → Pages**, select **Deploy from a branch**, the branch containing the files, and `/(root)`. Keep `.nojekyll`. Relative links support repository-path hosting.
+Publish the repository root from `main` in **Settings → Pages**. Keep `.nojekyll`.
 
-The site is safe to publish as a **preview** now: inactive forms hide their input controls. The original forms require a deployed HTTPS Edge Function URL, a public Supabase publishable key, and `formsOpen: true`. JOIN additionally requires its own endpoint, `privacyReady: true`, and a server-side `JOIN_OPEN=true` setting. Do not enter a service-role/secret key in the website.
-
-To open live collection, follow [docs/forms-spec.md](docs/forms-spec.md), including the database migration, function deployment, privacy notice, and live security tests. GitHub Pages alone cannot receive and store submissions.
-
-中文上线说明：[docs/forms-spec.zh-CN.md](docs/forms-spec.zh-CN.md)。
-
-JOIN v0.2 architecture and opening checklist: [docs/membership-v02.md](docs/membership-v02.md).
+Operational details: [forms specification](docs/forms-spec.md), [中文说明](docs/forms-spec.zh-CN.md), and [JOIN v0.2 notes](docs/membership-v02.md).

@@ -8,7 +8,7 @@
 访客浏览器 → GitHub Pages 表单 → Supabase Edge Function → PostgreSQL
 ```
 
-GitHub Pages 只提供静态页面，**不会替你保存表单回答**。表单数据不写进 GitHub 仓库，也不公开显示在网站上。目前三个表单可以预览，但在接收服务配置完成前，最终提交按钮保持禁用。
+GitHub Pages 只提供静态页面，**不会替你保存表单回答**。表单数据不写进 GitHub 仓库，也不公开显示在网站上。目前网站已连接 Supabase，三张表单可正式提交，仅限 18 岁及以上人士。
 
 | 入口 | 数据表 | 记录内容 |
 |---|---|---|
@@ -21,15 +21,15 @@ GitHub Pages 只提供静态页面，**不会替你保存表单回答**。表单
 ## 二、上线操作顺序
 
 1. **创建 Supabase 项目。**先确定该项目用于保存这三张表的数据；不要把密钥写入 GitHub 仓库。
-2. **建立数据库表。**在项目中运行 [`supabase/migrations/202609290001_forms_v1.sql`](../supabase/migrations/202609290001_forms_v1.sql)。使用 Supabase CLI 时，先关联项目，再运行 `supabase db push`。脚本建立三张独立回答表及限流表，启用 RLS，并撤销公开客户端对回答表的直接访问。
+2. **建立数据库表。**按顺序应用 [`supabase/migrations/`](../supabase/migrations/) 内的所有迁移。使用 Supabase CLI 时，先关联项目，再运行 `supabase db push`。迁移建立三张独立回答表、限流表、18 岁确认字段和自动删除任务，启用 RLS，并撤销公开客户端对回答表的直接访问。
 3. **部署接收函数。**部署 [`supabase/functions/submit/index.ts`](../supabase/functions/submit/index.ts)，例如运行 `supabase functions deploy submit`。[`supabase/config.toml`](../supabase/config.toml) 中的 `verify_jwt = false` 允许无登录访客请求函数；函数自身仍检查项目的 publishable key、允许的网站来源，并在写入前再次验证答案。
 4. **设置服务端配置。**在 Supabase Secrets 中设置 `PUBLIC_SITE_ORIGINS` 和 `RATE_LIMIT_SALT`。前者填写**准确的网站来源**，如 `https://用户名.github.io`；若有自定义域名，也把它加入逗号分隔的列表。这里填域名来源，不含仓库路径。后者使用较长的随机值，绝不提交到 GitHub。上线测试时还要确认托管网关提供可靠的访客 IP 请求头，供限流使用。
-5. **发布隐私说明。**在真正收集回答前，明确负责联系渠道、数据保存位置、保留期限、撤回或删除办法，以及研究和公开引用的用途。现有代码没有替你决定这些政策，也没有实现自动删除。咨询自由文本即使匿名引用，也应另行取得明确许可。
+5. **发布隐私说明。**目前已发布[英文隐私说明](../privacy/)，写明负责联系渠道、悉尼的数据存储位置、12 个月保留期限、撤回或删除办法，以及研究和公开引用的用途。数据库每天清理过期回答。咨询自由文本即使匿名引用，也应另行取得明确许可。
 6. **连接静态网站。**在 [`assets/js/api-config.js`](../assets/js/api-config.js) 填入已部署的函数地址，例如 `https://项目标识.supabase.co/functions/v1/submit`，以及 Supabase 的 **publishable key**。它可以出现在浏览器端；**secret key 和 service-role key 绝不能放在这个文件、网页或 GitHub 仓库中**。
 7. **做真实提交测试。**三张表各提交一条测试回答，确认分别进入对应数据表。再测试缺少必答题、无效 URL、超出选择上限、频繁提交、非允许来源，以及公开客户端无法 `SELECT` 私人回答。只有这些检查通过后，才开放正式收集。
 8. **部署 GitHub Pages。**把 `aixsd/` 内的静态文件放到仓库发布根目录，保留 `.nojekyll`；在仓库 **Settings → Pages** 选择分支和 `/(root)`。Supabase 数据库和函数需要单独部署，GitHub Pages 不会运行 `supabase/` 中的代码。
 
-如果只完成第 8 步，网站会显示，但**不会记录任何回答**；当前预览状态正是为避免误导访客而保留的。
+这八步已在当前项目中完成。若以后迁移到新的 Supabase 项目，需重新执行并测试；只部署 GitHub Pages 不会记录回答。
 
 ## 三、共用数据规则
 
@@ -73,6 +73,6 @@ GitHub Pages 只提供静态页面，**不会替你保存表单回答**。表单
 
 ## 七、当前状态
 
-这套文件已经准备好 GitHub Pages 静态页面、三张表的结构和 Supabase 接收函数。**尚未连接实际 Supabase 项目，也未完成真实入库、权限和限流测试。** 在这些步骤以及隐私说明完成前，表单保持预览模式。
+当前网站连接 Supabase 项目 `tzkdvvncvnttgjspzbot`。三张表的测试回答均成功入库并已清除；年龄限制、公开客户端无读取权限、非允许来源拦截和提交编号已验证。隐私联系邮箱为 `youthaisd.stunned539@slmails.com`。每张表的回答在 12 个月后由每日任务删除；成功页面会显示供删除请求使用的编号。
 
 技术配置可对照 [Supabase Edge Function 权限](https://supabase.com/docs/guides/functions/auth)、[CORS](https://supabase.com/docs/guides/functions/cors)、[RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) 和 [API 密钥](https://supabase.com/docs/guides/getting-started/api-keys) 官方文档。

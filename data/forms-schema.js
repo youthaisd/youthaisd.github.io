@@ -46,6 +46,7 @@ export const forms = {
     steps: [
       { title: 'About You', fields: [
         choice('has_consented','I have read the information above and agree to participate in this consultation.',[['yes','Yes'],['no','No']],true,{ consent: true }),
+        { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
         { name:'country_code', label:'Where are you currently based?', type:'country', options:[...countries,['prefer_not_to_say','Prefer not to say']], required:true },
         choice('current_role','Which best describes you?',roles),
         multi('interest_topics','Which areas related to AI and sustainable development are you most interested in?',topics,true,{ max:3, otherField:'interest_topics_other' }), other('interest_topics_other'),
@@ -79,6 +80,7 @@ export const forms = {
     duration:'3–5 minutes', version:'projects_v1.0',
     steps:[
       { title:'Project', fields:[
+        { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
         text('project_title','Project title',true,{ maxLength:150 }),
         choice('project_type','Which best describes this work?',[['research','Research'],['student_project','Student project'],['community_initiative','Community initiative'],['tool_platform','Tool / platform'],['startup_social_enterprise','Startup / social enterprise'],['educational_project','Educational project'],['dataset_open_resource','Dataset / open resource'],['other','Other']],true,{ otherField:'project_type_other' }), other('project_type_other'),
         choice('project_stage','What stage is the project currently at?',[['idea','Idea'],['early_development','Early development'],['prototype','Prototype'],['active','Active'],['ongoing_research','Ongoing research'],['completed','Completed']]),
@@ -109,6 +111,7 @@ export const forms = {
     duration:'3–5 minutes', version:'contribute_v1.0',
     steps:[
       { title:'About You', fields:[
+        { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
         text('contact_name','Preferred name',true,{ maxLength:150 }),
         { name:'contact_email', label:'Email address', type:'email', required:true },
         { name:'country_code', label:'Country / region', type:'country', options:countries, required:true },
