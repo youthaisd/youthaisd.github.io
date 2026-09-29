@@ -2,6 +2,8 @@
 
 Static GitHub Pages site with LISTEN, MAP, JOIN, and CONTRIBUTE routes. LISTEN, MAP, and CONTRIBUTE are open for adults aged 18 and older. JOIN remains a separate closed preview.
 
+The `/origin/` context note documents the Shanghai workshop and discussion paper that inspired the initiative, with source links and an explicit independence statement.
+
 ## Deployment
 
 - Site: <https://youthaisd.github.io/>

@@ -1,0 +1,44 @@
+.origin-page{background:var(--paper)}
+.origin-page h1,.origin-page h2,.origin-page h3{letter-spacing:-.045em}
+.origin-page h2{font-size:clamp(2rem,3.4vw,3.1rem);line-height:1.12;margin:20px 0 0}
+.origin-hero{background:var(--deep);color:#fff;padding:105px 0 112px}
+.origin-hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(210px,.55fr);gap:clamp(40px,7vw,100px);align-items:end}
+.origin-hero h1{font-size:clamp(3.1rem,6vw,6rem);line-height:1.02;margin:24px 0 28px;max-width:750px}
+.origin-lede{font-family:Georgia,serif;font-size:clamp(1.15rem,1.75vw,1.48rem);line-height:1.55;max-width:710px;color:#dcece7}
+.origin-hero-aside{border-top:1px solid #759994;padding-top:17px;color:#c7dcd5}
+.origin-hero-aside span,.commitment-card>span,.origin-timeline span{font-size:.73rem;font-weight:700;letter-spacing:.13em}
+.origin-hero-aside p{font-size:.9rem;line-height:1.6;margin:16px 0 0}
+.origin-block{padding:95px 0;border-bottom:1px solid var(--line)}
+.origin-two-col{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(40px,8vw,130px)}
+.origin-prose{max-width:740px;color:#40565a;line-height:1.7}
+.origin-prose p{margin:0 0 22px}
+.origin-prose .origin-large{font-family:Georgia,serif;font-size:clamp(1.22rem,2vw,1.55rem);line-height:1.55;color:var(--ink)}
+.origin-paper{background:#e9eeeb}
+.origin-commitments{background:#dfe9e3;padding:95px 0 105px}
+.origin-section-heading{max-width:730px;margin-bottom:45px}
+.origin-section-heading h2{margin:19px 0 18px}
+.origin-section-heading>p:last-child{line-height:1.65;color:#40565a}
+.commitment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.commitment-card{background:#fff;padding:clamp(26px,4vw,48px);border-top:4px solid #5a8c80;display:flex;flex-direction:column;min-height:425px}
+.commitment-card>span{color:#44786e}
+.commitment-card h3{font-size:clamp(1.7rem,2.4vw,2.45rem);line-height:1.15;margin:25px 0 23px}
+.commitment-card blockquote{font-family:Georgia,serif;font-size:1.35rem;line-height:1.4;margin:0 0 24px;color:#356e67}
+.commitment-card p{color:#4a6061;line-height:1.65;margin:0 0 30px}
+.commitment-card a{margin-top:auto;color:var(--ink);font-size:.85rem;font-weight:700;text-underline-offset:4px}
+.origin-source-note{font-size:.8rem;color:#53696a;line-height:1.55;margin:20px 0 0;max-width:860px}
+.origin-timeline{list-style:none;padding:0;margin:0;border-left:2px solid #9ab9ae}
+.origin-timeline li{position:relative;padding:0 0 37px 29px}
+.origin-timeline li:last-child{padding-bottom:0}
+.origin-timeline li:before{content:'';position:absolute;left:-7px;top:4px;width:12px;height:12px;background:#427e73;border-radius:50%}
+.origin-timeline span{display:block;color:#4e8077;margin-bottom:7px}
+.origin-timeline strong{display:block;font-family:Georgia,serif;font-weight:400;font-size:1.45rem;color:var(--ink)}
+.origin-timeline p{color:#536769;line-height:1.6;margin:7px 0 0}
+.origin-scope{padding:95px 0;background:#f4f1e9}
+.origin-pullquote{border-left:3px solid #5b8b7e;padding:8px 0 8px 24px;margin:35px 0 0;color:var(--ink);font-family:Georgia,serif;font-size:clamp(1.5rem,2.6vw,2.35rem);line-height:1.3}
+.origin-independence{background:#e3e8e5;padding:70px 0}
+.origin-independence .container{max-width:1000px}
+.origin-independence h2{margin:16px 0 18px}
+.origin-independence p:last-child{max-width:830px;color:#40585b;line-height:1.7;margin:0}
+.origin-page .primary-nav a[aria-current="page"]{color:var(--mint);border-bottom:1px solid var(--mint);padding-bottom:5px}
+@media(max-width:900px){.origin-hero-grid,.origin-two-col{grid-template-columns:1fr;gap:28px}.origin-hero-aside{max-width:600px}.origin-block,.origin-scope,.origin-commitments{padding:75px 0}}
+@media(max-width:700px){.origin-hero{padding:72px 0 78px}.origin-hero h1{font-size:3.35rem}.commitment-grid{grid-template-columns:1fr}.commitment-card{min-height:0}.origin-block,.origin-scope,.origin-commitments{padding:65px 0}.origin-independence{padding:60px 0}.origin-page .primary-nav a[aria-current="page"]{border-bottom:1px solid rgba(255,255,255,.13);padding-bottom:14px}}
