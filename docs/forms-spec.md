@@ -15,7 +15,7 @@ Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `co
 - The five-step interface preserves values on Back. Drafts use `sessionStorage`, not `localStorage`, and are deleted after accepted submission.
 - Source is one of `direct`, `consultation`, `projects`, or `website`. It is a navigation source, not a person identifier. No cross-form ID, email matching, or fingerprinting is implemented.
 - Only six answer-free `CustomEvent` names are emitted by the browser: `consultation_started`, `consultation_completed`, `project_started`, `project_completed`, `contributor_started`, `contributor_completed`. They are not transmitted to analytics by this release.
-- No file uploads, public data explorer, membership application, partner application, or automatic scoring exist in v1.
+- No file uploads, public data explorer, membership application, partner application, or automatic scoring exist in the original three-form v1. JOIN membership is a separate v0.2 route; see [membership-v02.md](membership-v02.md).
 
 ## Tables and key fields
 

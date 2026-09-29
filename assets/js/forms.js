@@ -20,12 +20,18 @@ const $ = selector => document.querySelector(selector);
 const stepContent = $('#step-content');
 const notice = $('#form-notice');
 const wizard = $('#wizard');
-const ready = /^https:\/\//.test(apiConfig.endpoint) && Boolean(apiConfig.publishableKey);
+const ready = /^https:\/\//.test(apiConfig.endpoint) && Boolean(apiConfig.publishableKey) && apiConfig.formsOpen === true;
 const source = cleanSource(new URLSearchParams(location.search).get('source') || 'direct');
 
 $('#form-intro').textContent = definition.intro;
 $('#duration').textContent = `Estimated time · ${definition.duration}`;
-if (!ready) showNotice('This form is available to preview. Submissions will open after the privacy information and final checks are complete.', 'info');
+if (!ready) {
+  const banner = document.createElement('p');
+  banner.className = 'availability-banner';
+  banner.textContent = 'This form is not accepting responses yet. Questions will be available when the privacy information and receiving service are complete.';
+  document.querySelector('.form-heading').append(banner);
+  document.querySelector('.form-shell').hidden = true;
+}
 
 function showNotice(message, kind = 'error') {
   notice.textContent = message;

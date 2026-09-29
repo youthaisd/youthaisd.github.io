@@ -8,6 +8,7 @@ export const topics = [
   ['responsible_ai', 'Responsible AI'],
   ['governance_policy', 'Governance & Public Policy'],
   ['economic_social_development', 'Economic & Social Development'],
+  ['data_evidence', 'Data & Evidence'],
   ['other', 'Other'],
 ];
 
