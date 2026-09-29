@@ -25,7 +25,7 @@ const source = cleanSource(new URLSearchParams(location.search).get('source') ||
 
 $('#form-intro').textContent = definition.intro;
 $('#duration').textContent = `Estimated time · ${definition.duration}`;
-if (!ready) showNotice('This form is available to preview. Submissions will open when the secure receiving service is connected.', 'info');
+if (!ready) showNotice('This form is available to preview. Submissions will open after the privacy information and final checks are complete.', 'info');
 
 function showNotice(message, kind = 'error') {
   notice.textContent = message;

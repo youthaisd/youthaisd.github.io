@@ -3,6 +3,18 @@
 Static GitHub Pages site with three five-step forms. The site has no frontend build step.
 It uses system fonts and makes no third-party asset or analytics requests.
 
+## Deployment status
+
+The site is published at <https://youthaisd.github.io/>. Supabase project
+`tzkdvvncvnttgjspzbot` has the v1.0 migration, `submit` Edge Function, allowed
+site origin, and rate-limit secret installed. Synthetic submissions to all three
+tables were verified and removed. Public clients cannot read or write response
+tables directly.
+
+The public forms remain in **preview mode**. `assets/js/api-config.js` is blank
+until a contact address, retention period, privacy notice, and final live checks
+are ready. Do not turn on collection before those items are complete.
+
 ## Local preview
 
 Serve this directory over HTTP (ES modules do not run correctly from `file://`). For example: `python -m http.server 8000`, then open `http://localhost:8000/`.
