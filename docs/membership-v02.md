@@ -4,7 +4,7 @@ JOIN is a separate, low-barrier community route. LISTEN, MAP and CONTRIBUTE rema
 
 ## Status
 
-The public JOIN page is closed by default. It shows the membership philosophy and a clear unavailable notice. The form is hidden until the receiving function and privacy notice are ready. The function also rejects submissions unless its server-side `JOIN_OPEN` secret is exactly `true`. Do not set that value until the checks below pass.
+JOIN is paused because its audience and fields overlap with CONTRIBUTE. The public navigation offers LISTEN, MAP and CONTRIBUTE; the old `/join/` address points visitors toward CONTRIBUTE. The membership implementation below is retained as an unpublished prototype. It must not be activated without a fresh product decision and the checks below. The function rejects submissions unless its server-side `JOIN_OPEN` secret is exactly `true`.
 
 ## Data model
 

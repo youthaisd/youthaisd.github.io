@@ -107,7 +107,7 @@ export const forms = {
   },
   contribute: {
     title:'Contribute to AI×SD', subtitle:'Express interest in future research, publications, projects and discussions.',
-    intro:'Joining the YouthAISD community is separate from contributing to specific work. This form expresses interest in substantive research, projects or discussions; submitting it does not confer Contributor status or a representative role. Recognition follows actual contribution.',
+    intro:'This form expresses interest in substantive research, projects or discussions. Submitting it does not confer Contributor status or a representative role. Recognition follows actual contribution.',
     duration:'3–5 minutes', version:'contribute_v1.0',
     steps:[
       { title:'About You', fields:[

@@ -1,6 +1,6 @@
 # YouthAISD — website v0.2 with Forms v1.0
 
-Static GitHub Pages site with LISTEN, MAP, JOIN, and CONTRIBUTE routes. LISTEN, MAP, and CONTRIBUTE are open for adults aged 18 and older. JOIN remains a separate closed preview.
+Static GitHub Pages site with three public routes: LISTEN, MAP, and CONTRIBUTE. They are open for adults aged 18 and older. An earlier JOIN prototype remains closed and is no longer promoted on the public site.
 
 The `/origin/` context note documents the Shanghai workshop and discussion paper that inspired the initiative, with source links and an explicit independence statement.
 

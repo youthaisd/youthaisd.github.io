@@ -2,7 +2,7 @@
 
 ## Status and deployment boundary
 
-The LISTEN, MAP, and CONTRIBUTE forms and Supabase backend are deployed for live submissions. JOIN is a separate v0.2 route and remains closed; see [membership notes](membership-v02.md). The three forms are restricted to adults aged 18 or older. The browser contains only a publishable key; the success pages show confirmation and a deletion-request reference only after an accepted API response.
+The LISTEN, MAP, and CONTRIBUTE forms and Supabase backend are deployed for live submissions. A separate JOIN prototype is paused and not promoted on the public site; see [membership notes](membership-v02.md). The three forms are restricted to adults aged 18 or older. The browser contains only a publishable key; the success pages show confirmation and a deletion-request reference only after an accepted API response.
 
 Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `contribute/`, each with `success/` (and a `success.html` equivalent). All asset links are relative and work under a repository path.
 
