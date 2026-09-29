@@ -107,7 +107,7 @@ export const forms = {
   },
   contribute: {
     title:'Contribute to AI×SD', subtitle:'Express interest in future research, publications, projects and discussions.',
-    intro:'This form expresses interest in substantive research, projects or discussions. Submitting it does not confer Contributor status or a representative role. Recognition follows actual contribution.',
+    intro:'Tell us how you might contribute to future research, projects or discussions. We review responses in relation to specific opportunities and may get in touch where there is a good fit. Any role or credit reflects work actually undertaken.',
     duration:'3–5 minutes', version:'contribute_v1.0',
     steps:[
       { title:'About You', fields:[
