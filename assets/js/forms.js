@@ -1,6 +1,7 @@
 import { forms, fieldList, isVisible, cleanSource } from '../../data/forms-schema.js';
 import { normalizeAndValidate, submissionPayload, wordCount } from '../../data/validation.js';
 import { apiConfig } from './api-config.js';
+import { chinaRegionCodes } from '../../data/taxonomy.js';
 
 const root = document.querySelector('[data-form]');
 const formName = root?.dataset.form;
@@ -103,17 +104,37 @@ function renderMulti(field, wrapper) {
 function renderCountry(field, wrapper) {
   const label = el('label','field-label',field.label);
   if (field.required) label.append(el('span','required-mark',' *'));
-  const input = el('input','text-input'); input.type = 'search'; input.name = field.name; input.placeholder = 'Start typing a country or region'; input.autocomplete = 'off';
-  const listId = `list-${field.name}`; input.setAttribute('list',listId);
-  const current = field.options.find(([id]) => id === state.values[field.name]);
-  input.value = current?.[1] || '';
-  const dataList = el('datalist'); dataList.id = listId;
-  for (const [, name] of field.options) { const option = el('option'); option.value = name; dataList.append(option); }
-  input.addEventListener('input', () => {
-    const match = field.options.find(([, name]) => name.toLowerCase() === input.value.trim().toLowerCase());
-    markChanged(field.name, match?.[0] || '');
-  });
-  label.append(input); wrapper.append(label,dataList,el('p','field-hint','Choose a suggestion from the list.'));
+  const search = el('input','text-input country-search');
+  search.type = 'search'; search.placeholder = 'Filter countries or regions'; search.autocomplete = 'off';
+  search.setAttribute('aria-label',`Filter ${field.label.toLowerCase()} options`);
+  const select = el('select','text-input country-select');
+  select.name = field.name;
+  label.htmlFor = `select-${field.name}`; select.id = label.htmlFor;
+  const updateOptions = () => {
+    const query = search.value.trim().toLowerCase();
+    const chosen = state.values[field.name] || '';
+    select.replaceChildren();
+    const placeholder = el('option','',field.required ? 'Select a country or region' : 'None selected');
+    placeholder.value = ''; select.append(placeholder);
+    let matches = 0;
+    const addGroup = (title, options) => {
+      const group = el('optgroup'); group.label = title;
+      for (const [id, name] of options) {
+        if (query && id !== chosen && !name.toLowerCase().includes(query) && !id.toLowerCase().includes(query) && !(title === 'China' && 'china'.includes(query))) continue;
+        const option = el('option','',name); option.value = id; group.append(option); matches++;
+      }
+      if (group.childElementCount) select.append(group);
+    };
+    addGroup('China',field.options.filter(([id]) => chinaRegionCodes.includes(id)));
+    addGroup('Other countries and regions',field.options.filter(([id]) => /^[A-Z]{2}$/.test(id) && !chinaRegionCodes.includes(id)));
+    addGroup('Other responses',field.options.filter(([id]) => !/^[A-Z]{2}$/.test(id)));
+    if (!matches) { const option = el('option','','No matches'); option.disabled = true; select.append(option); }
+    select.value = chosen;
+  };
+  search.addEventListener('input',updateOptions);
+  select.addEventListener('change',() => markChanged(field.name,select.value));
+  updateOptions();
+  wrapper.append(label,search,select,el('p','field-hint','Search to narrow the list, then select one option.'));
 }
 function renderLinks(field, wrapper) {
   addHeading(wrapper, field);

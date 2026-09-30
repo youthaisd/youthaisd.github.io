@@ -10,7 +10,7 @@ const acknowledgementFields = () => [
     'name','Yes, list my name'],['name_affiliation','Yes, list my name and affiliation'],['unlisted','No, keep my contribution unlisted']],true,{ hint:'Optional public recognition. Your answer will never make your response, email, or project details public. Listings are checked by a person before publication and can be removed on request.' }),
   text('public_display_name','Name to display publicly',true,{ maxLength:150, hint:'This exact name may appear on the Contributors page after manual review. Do not enter an email address.', showIf:{ field:'public_acknowledgement', in:['name','name_affiliation'] } }),
   text('public_affiliation','Affiliation to display publicly',true,{ maxLength:150, showIf:{ field:'public_acknowledgement', in:['name_affiliation'] } }),
-  text('public_region','Country or region to display publicly (optional)',false,{ maxLength:100, showIf:{ field:'public_acknowledgement', in:['name','name_affiliation'] } }),
+  { name:'public_region_code', label:'Country or region to display publicly (optional)', type:'country', options:countries, required:false, showIf:{ field:'public_acknowledgement', in:['name','name_affiliation'] } },
 ];
 
 export const engagement = [
@@ -49,12 +49,12 @@ export const forms = {
     title: 'Youth Consultation on AI & Sustainable Development',
     subtitle: 'Understanding needs, barriers and opportunities for meaningful youth engagement.',
     intro: 'This exploratory consultation seeks to understand how young people engage with AI and sustainable development, what barriers they encounter, and what resources or opportunities would be most useful. Responses may be analysed in aggregate and used to inform a public consultation brief. Individual responses will not be publicly attributed without explicit permission. Participation is voluntary.',
-    duration: '4–6 minutes', version: 'consultation_v1.1',
+    duration: '4–6 minutes', version: 'consultation_v1.2',
     steps: [
       { title: 'About You', fields: [
         choice('has_consented','I have read the information above and agree to participate in this consultation.',[['yes','Yes'],['no','No']],true,{ consent: true }),
         { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
-        { name:'country_code', label:'Where are you currently based?', type:'country', options:[...countries,['prefer_not_to_say','Prefer not to say']], required:true },
+        { name:'country_code', label:'Where are you currently based? (country or region)', type:'country', options:[...countries,['prefer_not_to_say','Prefer not to say']], required:true },
         choice('current_role','Which best describes you?',roles),
         multi('interest_topics','Which areas related to AI and sustainable development are you most interested in?',topics,true,{ max:3, otherField:'interest_topics_other' }), other('interest_topics_other'),
       ]},
@@ -85,14 +85,14 @@ export const forms = {
   projects: {
     title:'Share a Project or Case', subtitle:'Map work at the intersection of AI and sustainable development.',
     intro:'We are mapping projects, research, tools and practical cases. Submissions may inform future research, case collections or public resources. Submission does not guarantee publication, endorsement or partnership with AI×SD.',
-    duration:'3–5 minutes', version:'projects_v1.1',
+    duration:'3–5 minutes', version:'projects_v1.2',
     steps:[
       { title:'Project', fields:[
         { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
         text('project_title','Project title',true,{ maxLength:150 }),
         choice('project_type','Which best describes this work?',[['research','Research'],['student_project','Student project'],['community_initiative','Community initiative'],['tool_platform','Tool / platform'],['startup_social_enterprise','Startup / social enterprise'],['educational_project','Educational project'],['dataset_open_resource','Dataset / open resource'],['other','Other']],true,{ otherField:'project_type_other' }), other('project_type_other'),
         choice('project_stage','What stage is the project currently at?',[['idea','Idea'],['early_development','Early development'],['prototype','Prototype'],['active','Active'],['ongoing_research','Ongoing research'],['completed','Completed']]),
-        { name:'project_region', label:'Where is the project primarily based or implemented?', type:'country', options:[...countries,['international','International'],['online','Online'],['other','Other']], required:true },
+        { name:'project_region', label:'Where is the project primarily based or implemented? (country or region)', type:'country', options:[...countries,['international','International'],['online','Online'],['other','Other']], required:true },
         multi('project_topics','Which areas does this project relate to?',topics,true,{ max:3, otherField:'project_topics_other' }), other('project_topics_other'),
         multi('sdgs','Which Sustainable Development Goals, if any, are particularly relevant?',sdgs,false,{ hint:'Optional. You do not need to assign an SDG if it is not useful for describing the project.' }),
       ]},
@@ -117,7 +117,7 @@ export const forms = {
   contribute: {
     title:'Become a YouthAISD Contributor', subtitle:'Make a first contribution and tell us how you could take part in future work.',
     intro:'This form is the first step toward becoming a YouthAISD Contributor. Share a small initial contribution and tell us how you would like to take part. A person reviews each submission before confirming Contributor status. We normally confirm it unless the submission violates basic standards of respectful and lawful participation. Contributor status does not confer a representative role.',
-    duration:'3–5 minutes', version:'contribute_v1.1',
+    duration:'3–5 minutes', version:'contribute_v1.2',
     steps:[
       { title:'About You', fields:[
         { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },

@@ -1,18 +1,20 @@
-# AI×SD Forms v1.1 — implementation and analysis specification
+# AI×SD Forms v1.2 — implementation and analysis specification
 
 ## Status and deployment boundary
 
 The LISTEN, MAP, and CONTRIBUTE forms and Supabase backend are deployed for live submissions. A separate JOIN prototype is paused and not promoted on the public site; see [membership notes](membership-v02.md). The three forms are restricted to adults aged 18 or older. The browser contains only a publishable key; the success pages show confirmation and a deletion-request reference only after an accepted API response.
 
-The new Contributor review migration is prepared but still needs to be applied and checked against the live database. Until then, the public form can receive first contributions, but its review status is not tracked in the table.
+The Contributor review and public acknowledgement migrations were applied and verified on the live database on 2026-09-30 for Forms v1.1.
 
-The v1.1 public acknowledgement changes are prepared in code only. Deploy the review migration and acknowledgement migration, then both Edge Functions, test, and only then publish the updated static site. Publishing the v1.1 forms first would make live submissions fail.
+The v1.2 country-label and controlled public-region changes are prepared in code only. Apply `202609300003_country_region_v12.sql`, deploy both updated Edge Functions, test, and only then publish the v1.2 static site. Publishing the v1.2 forms first would make live submissions fail.
 
 Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `contribute/`, each with `success/` (and a `success.html` equivalent). All asset links are relative and work under a repository path.
 
 ## Shared rules
 
-- `data/taxonomy.js` is the single source for topic, role, contribution-type, and country IDs. Labels can change; IDs must not be repurposed after collection starts.
+- `data/taxonomy.js` is the single source for topic, role, contribution-type, and country IDs. `data/country-labels.js` pins English display labels; IDs must not be repurposed after collection starts.
+- Country and region choices use the same 249 existing two-letter IDs. The picker groups `CN` (Chinese mainland), `HK` (Hong Kong SAR, China), `MO` (Macao SAR, China), and `TW` (Taiwan, China) under a non-selectable “China” heading. Keep the four raw codes distinct. For country-level reporting, map all four to `CN` via `reportingCountryCode`; do not overwrite response rows. The `CN` label in v1.0 was “China”, so earlier `CN` answers must not be retrospectively described as specifically mainland responses. Use `form_version` to distinguish collection wording.
+- The China-region English wording follows [National Bureau of Statistics English material](https://www.stats.gov.cn/english/understanding/202403/P020240328547250958291.pdf). Existing two-letter IDs are retained with reference to [GB/T 2659.1—2022](https://std.samr.gov.cn//gb/search/gbDetailed?id=F159DFC2A91047EFE05397BE0A0AF334). Other display labels are pinned for this version so they do not vary with browser locale data.
 - All multi-select values store ID arrays. Other text is stored in a separate field and cleared when Other is deselected.
 - Maximum-three questions display a selection count and disable further options at three.
 - `none` and `nothing_currently` are exclusive.
@@ -25,9 +27,9 @@ Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `co
 
 | Form | Table | Version | Main analysis fields | Personal contact fields |
 |---|---|---|---|---|
-| LISTEN | `consultation_responses` | `consultation_v1.1` | country, role, interest topics, familiarity, engagement, top barriers, desired resources, ideal solution, future priorities, willingness to contribute | follow-up email/name only when consented; separate display name if public acknowledgement chosen |
-| MAP | `project_submissions` | `projects_v1.1` | project type/stage/region/topics/SDGs, problem, AI role, progress, links, needs, public-use permission | submitter name/email/organisation |
-| CONTRIBUTE | `contributor_interests` | `contribute_v1.1` | role, field, topics, contribution types, small first contribution, availability, profile links | preferred name/email |
+| LISTEN | `consultation_responses` | `consultation_v1.2` | country, role, interest topics, familiarity, engagement, top barriers, desired resources, ideal solution, future priorities, willingness to contribute | follow-up email/name only when consented; separate display name if public acknowledgement chosen |
+| MAP | `project_submissions` | `projects_v1.2` | project type/stage/region/topics/SDGs, problem, AI role, progress, links, needs, public-use permission | submitter name/email/organisation |
+| CONTRIBUTE | `contributor_interests` | `contribute_v1.2` | role, field, topics, contribution types, small first contribution, availability, profile links | preferred name/email |
 
 Each table also stores its own UUID, creation time, source, form version, and adult confirmation. There is no shared `person_id`. The SQL migrations revoke `anon` and `authenticated` access to all response tables and grant the service role access for verified data requests. The Edge Function uses the admin client only on the server.
 
@@ -49,7 +51,9 @@ The review migration `202609300001_contributor_review.sql` adds `review_status` 
 
 ### Public acknowledgements
 
-Each form ends with a separate choice: `name`, `name_affiliation`, or `unlisted`. A display name is required for either public choice; affiliation is required only for `name_affiliation`; region is optional. Neither follow-up consent nor project public-use permission implies a public name listing. Public display does not include answer text, project details, email, or profile links. Existing v1.0 rows default to `unlisted`; no consent is inferred retroactively.
+Each form ends with a separate choice: `name`, `name_affiliation`, or `unlisted`. A display name is required for either public choice; affiliation is required only for `name_affiliation`; `public_region_code` is an optional controlled selection using the shared two-letter IDs. Neither follow-up consent nor project public-use permission implies a public name listing. Public display does not include answer text, project details, email, or profile links. Existing v1.0 rows default to `unlisted`; no consent is inferred retroactively.
+
+Migration 003 adds `public_region_code` without altering the v1.1 `public_region` text column or old rows. The v1.2 public endpoint displays only the controlled code's fixed label; any legacy free-text region remains private. No historical region is automatically recoded.
 
 Migration `202609300002_public_acknowledgements.sql` adds the display fields to all three tables. Consultation and project rows also receive `public_listing_status`: the submit function sets opted-in rows to `pending`, unlisted rows to `unlisted`. The reviewer checks the received submission and consent once, then changes that status to `approved` or `declined`. Contributor rows use the existing `review_status` for the same single manual decision. Any eligible adult can submit; no identity pre-approval is required. For a Contributor row that opted in, the one `review_status = approved` confirmation also makes the acknowledgement visible. No status change is automatic.
 
@@ -80,7 +84,7 @@ For project mapping, summarize topics × stage, topics × needs, and stage × ne
 3. Set `PUBLIC_SITE_ORIGINS` (comma-separated exact origins, e.g. `https://example.org`) and `RATE_LIMIT_SALT` in Supabase Secrets. Verify gateway IP header behavior.
 4. Publish a privacy notice naming the responsible contact, storage location, retention period, withdrawal/deletion process, and intended research/publication use.
 5. In `assets/js/api-config.js`, set the public Edge Function URL and the Supabase **publishable** key. Never paste a secret/service-role key here.
-6. Test all three v1.1 forms against the deployed function; confirm accepted rows land in different tables and direct `anon`/`authenticated` table reads are denied. Test all three acknowledgement choices, conditional display fields, negative cases, rate limit, and origin rejection. Confirm the public endpoint returns no pending, unlisted, declined, expired, or unconfirmed Contributor records. Confirm a manually approved listing appears and disappears after reversal.
+6. Test all three v1.2 forms against the deployed function; confirm accepted rows land in different tables and direct `anon`/`authenticated` table reads are denied. Test the four China-region options, other-region search, all three acknowledgement choices, conditional display fields, negative cases, rate limit, and origin rejection. Confirm the public endpoint returns no pending, unlisted, declined, expired, or unconfirmed Contributor records. Confirm a manually approved listing appears and disappears after reversal.
 7. Publish the static directory to GitHub Pages after the checks pass.
 
 Current [Supabase Edge Function auth](https://supabase.com/docs/guides/functions/auth), [CORS](https://supabase.com/docs/guides/functions/cors), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), and [API key](https://supabase.com/docs/guides/getting-started/api-keys) documentation informed the server setup.

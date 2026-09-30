@@ -58,7 +58,7 @@ export function normalizeAndValidate(formName, raw, stepIndex = null) {
     if (values.public_acknowledgement === 'unlisted') {
       values.public_display_name = null;
       values.public_affiliation = null;
-      values.public_region = null;
+      values.public_region_code = null;
     } else if (values.public_acknowledgement === 'name') {
       values.public_affiliation = null;
     }

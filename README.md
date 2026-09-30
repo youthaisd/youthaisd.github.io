@@ -1,4 +1,4 @@
-# YouthAISD — website v0.2 with Forms v1.0
+# YouthAISD — website v0.2 with Forms v1.2 prepared
 
 Static GitHub Pages site with three public routes: LISTEN, MAP, and CONTRIBUTE. They are open for adults aged 18 and older. An earlier JOIN prototype remains closed and is no longer promoted on the public site.
 
@@ -17,7 +17,9 @@ JOIN is separately gated by `assets/js/join-config.js` and its server settings. 
 
 The Contributor pathway requires a first contribution. Migration `supabase/migrations/202609300001_contributor_review.sql` was applied to the live project on 2026-09-30. Submissions remain `pending` until an authorized person confirms or declines them in Supabase. The review normally confirms status unless a submission violates basic standards of respectful and lawful participation.
 
-Public acknowledgements use migration `202609300002_public_acknowledgements.sql`, the updated `submit` function, and the new `contributors` function; these were deployed and verified on 2026-09-30. Each form is version 1.1. The public `/contributors/` page reads only manually approved, opted-in display fields from the function. It never queries raw tables from the browser. The unused JOIN migration was removed before deployment.
+Public acknowledgements use migration `202609300002_public_acknowledgements.sql`, the updated `submit` function, and the `contributors` function; these were deployed and verified on 2026-09-30 for Forms v1.1. The public `/contributors/` page reads only manually approved, opted-in display fields from the function. It never queries raw tables from the browser. The unused JOIN migration was removed before deployment.
+
+Forms v1.2 pins English country and region labels. The China group presents Chinese mainland, Hong Kong SAR, China, Macao SAR, China, and Taiwan, China as distinct stored codes. Country-level analysis can group these under China while preserving the original selections. Earlier v1.0 `CN` responses used the broader “China” label and must be reported with their original wording in mind. **Deploy `202609300003_country_region_v12.sql` and both updated Edge Functions, then verify live submissions, before publishing the v1.2 static site.**
 
 ## Local preview
 

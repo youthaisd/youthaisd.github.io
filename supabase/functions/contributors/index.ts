@@ -1,4 +1,5 @@
 import { withSupabase } from 'npm:@supabase/server@^1';
+import { countryLabel } from '../../../data/taxonomy.js';
 
 const sources = [
   { table:'consultation_responses', label:'Youth Consultation', approval:'public_listing_status' },
@@ -18,7 +19,7 @@ export default {
     const contributors: Array<{name:string; affiliation?:string; region?:string; contribution:string; sortDate:string}> = [];
     for (const source of sources) {
       let query = context.supabaseAdmin.from(source.table)
-        .select('created_at, public_acknowledgement, public_display_name, public_affiliation, public_region')
+        .select('created_at, public_acknowledgement, public_display_name, public_affiliation, public_region_code')
         .eq(source.approval,'approved')
         .neq('public_acknowledgement','unlisted')
         .gte('created_at',cutoff.toISOString())
@@ -34,7 +35,7 @@ export default {
         contributors.push({
           name:row.public_display_name,
           ...(row.public_acknowledgement === 'name_affiliation' && row.public_affiliation ? { affiliation:row.public_affiliation } : {}),
-          ...(row.public_region ? { region:row.public_region } : {}),
+          ...(row.public_region_code && countryLabel(row.public_region_code) ? { region:countryLabel(row.public_region_code)! } : {}),
           contribution:`${source.label} · ${month}`,
           sortDate:row.created_at,
         });
