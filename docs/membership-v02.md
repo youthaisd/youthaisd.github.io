@@ -8,7 +8,7 @@ JOIN is paused because its audience and fields overlap with CONTRIBUTE. The publ
 
 ## Data model
 
-Run `supabase/migrations/202609290002_membership_v02.sql` after the original forms migration. It creates a private `memberships` table with RLS enabled, no public `SELECT` or `INSERT` grant, no cross-form person ID, no public directory view, and no automatically generated member code. `directory_consent` and `directory_approved` are separate; approval defaults to false. A directory listing may be published only after opt-in and manual review. Never publish email addresses.
+The proposed JOIN database migration was removed on 2026-09-30. This document is historical design context only; there is no JOIN table to deploy from this repository. A future JOIN feature would require a new product decision, migration, privacy review, and tests. Never publish email addresses.
 
 The proposed internal member-code format is `YAISD-YYYY-M-NNNN`. Codes remain unassigned in this release. If introduced later, generate them on the server after deciding how duplicate submissions and verification will work. A membership confirmation or certificate may later state membership factually; it is not an accreditation or qualification.
 

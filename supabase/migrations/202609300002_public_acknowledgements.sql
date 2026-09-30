@@ -36,7 +36,7 @@ begin
         (public_acknowledgement = ''unlisted'' and public_display_name is null and public_affiliation is null and public_region is null)
         or (public_acknowledgement = ''name'' and public_display_name is not null and length(btrim(public_display_name)) > 0 and public_affiliation is null)
         or (public_acknowledgement = ''name_affiliation'' and public_display_name is not null and length(btrim(public_display_name)) > 0 and public_affiliation is not null and length(btrim(public_affiliation)) > 0)
-      )', table_name, table_name || '_public_acknowledgement_check');
+      )', table_name, table_name || '_public_listing_consistency_check');
     else
       execute format('alter table public.%I add column public_listing_status text not null default ''unlisted'' check (public_listing_status in (''unlisted'', ''pending'', ''approved'', ''declined''))', table_name);
       execute format('alter table public.%I add column public_listing_reviewed_at timestamptz', table_name);
@@ -44,7 +44,7 @@ begin
         (public_acknowledgement = ''unlisted'' and public_listing_status = ''unlisted'' and public_display_name is null and public_affiliation is null and public_region is null)
         or (public_acknowledgement = ''name'' and public_listing_status <> ''unlisted'' and public_display_name is not null and length(btrim(public_display_name)) > 0 and public_affiliation is null)
         or (public_acknowledgement = ''name_affiliation'' and public_listing_status <> ''unlisted'' and public_display_name is not null and length(btrim(public_display_name)) > 0 and public_affiliation is not null and length(btrim(public_affiliation)) > 0)
-      )', table_name, table_name || '_public_acknowledgement_check');
+      )', table_name, table_name || '_public_listing_consistency_check');
       execute format('create trigger public_listing_review_stamp before update of public_listing_status on public.%I for each row execute function public.stamp_public_listing_review()', table_name);
     end if;
   end loop;
