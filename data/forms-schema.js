@@ -106,8 +106,8 @@ export const forms = {
     ],
   },
   contribute: {
-    title:'Contribute to AI×SD', subtitle:'Express interest in future research, publications, projects and discussions.',
-    intro:'Tell us how you might contribute to future research, projects or discussions. We review responses in relation to specific opportunities and may get in touch where there is a good fit. Any role or credit reflects work actually undertaken.',
+    title:'Become a YouthAISD Contributor', subtitle:'Make a first contribution and tell us how you could take part in future work.',
+    intro:'This form is the first step toward becoming a YouthAISD Contributor. Share a small initial contribution and tell us how you would like to take part. A person reviews each submission before confirming Contributor status. We normally confirm it unless the submission violates basic standards of respectful and lawful participation. Contributor status does not confer a representative role.',
     duration:'3–5 minutes', version:'contribute_v1.0',
     steps:[
       { title:'About You', fields:[

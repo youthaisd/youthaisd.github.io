@@ -4,6 +4,8 @@
 
 The LISTEN, MAP, and CONTRIBUTE forms and Supabase backend are deployed for live submissions. A separate JOIN prototype is paused and not promoted on the public site; see [membership notes](membership-v02.md). The three forms are restricted to adults aged 18 or older. The browser contains only a publishable key; the success pages show confirmation and a deletion-request reference only after an accepted API response.
 
+The new Contributor review migration is prepared but still needs to be applied and checked against the live database. Until then, the public form can receive first contributions, but its review status is not tracked in the table.
+
 Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `contribute/`, each with `success/` (and a `success.html` equivalent). All asset links are relative and work under a repository path.
 
 ## Shared rules
@@ -39,7 +41,9 @@ Title is at most 150 characters. The project stage changes the progress question
 
 ### CONTRIBUTE
 
-Contribution types and topics allow up to three. A small first contribution is required: gap (80–200 words), resource (title or URL plus 50–150-word explanation), or small project (80–200 words). Resource titles and explanations are joined in `micro_contribution_text`; a web URL, when provided, is stored separately in `micro_contribution_url`. No automatic scoring or Contributor status is created. Profile links allow up to four HTTP(S) URLs.
+Contribution types and topics allow up to three. A small first contribution is required: gap (80–200 words), resource (title or URL plus 50–150-word explanation), or small project (80–200 words). Resource titles and explanations are joined in `micro_contribution_text`; a web URL, when provided, is stored separately in `micro_contribution_url`. There is no automatic scoring or approval. An authorized person normally confirms Contributor status after reading the first contribution, declining only submissions that violate basic standards of respectful and lawful participation. Profile links allow up to four HTTP(S) URLs.
+
+The review migration `202609300001_contributor_review.sql` adds `review_status` (`pending`, `approved`, `declined`), `reviewed_at`, and a private `review_note` to `contributor_interests`. New and existing records start as `pending`. The public success page confirms receipt only. In Supabase Table Editor, the authorized reviewer filters this table to `pending`, reads the first contribution, and changes `review_status` to `approved` or `declined`; the trigger stamps `reviewed_at`. The dashboard review is the required personal confirmation. Do not present a pending row as an approved Contributor, and do not publish contact details. This release has no automatic approval email or public Contributor directory.
 
 Client and server both use `data/validation.js`; the server validates again before insertion. Text is trimmed and control characters removed. Links accept only HTTP(S). Text from submissions must remain plain text in any future public rendering and must never be inserted as raw HTML.
 

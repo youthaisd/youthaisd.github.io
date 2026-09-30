@@ -15,6 +15,8 @@ The Edge Function validates requests, checks the allowed site origin, and rate l
 
 JOIN is separately gated by `assets/js/join-config.js` and its server settings. It must remain closed until its own privacy and deployment checks are completed.
 
+The Contributor pathway requires a first contribution. Apply `supabase/migrations/202609300001_contributor_review.sql` to the live project before using the new review workflow. Submissions then remain `pending` until an authorized person confirms or declines them in Supabase. The review normally confirms status unless a submission violates basic standards of respectful and lawful participation. This migration has been prepared in the repository but has not been verified on the live database from this workspace.
+
 ## Local preview
 
 Serve the directory over HTTP; ES modules do not run correctly from `file://`.

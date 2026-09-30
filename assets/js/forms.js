@@ -173,7 +173,7 @@ function render() {
   }
   if (formName === 'consultation' && state.values.has_consented === 'no' && state.step === 0) stepContent.append(el('p','decline-note','You have chosen not to participate. No response will be submitted.'));
   $('#back-button').hidden = state.step === 0;
-  const next = $('#next-button'); next.textContent = state.step === definition.steps.length - 1 ? (formName === 'contribute' ? 'Express Interest' : 'Submit response') : 'Continue';
+  const next = $('#next-button'); next.textContent = state.step === definition.steps.length - 1 ? (formName === 'contribute' ? 'Submit first contribution' : 'Submit response') : 'Continue';
   next.disabled = state.busy || (state.step === 0 && formName === 'consultation' && state.values.has_consented === 'no') || (state.step === definition.steps.length - 1 && !ready);
   if (state.step === definition.steps.length - 1 && !ready) next.textContent = 'Submissions not open yet';
   save();
