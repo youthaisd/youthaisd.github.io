@@ -17,6 +17,8 @@ JOIN is separately gated by `assets/js/join-config.js` and its server settings. 
 
 The Contributor pathway requires a first contribution. Apply `supabase/migrations/202609300001_contributor_review.sql` to the live project before using the new review workflow. Submissions then remain `pending` until an authorized person confirms or declines them in Supabase. The review normally confirms status unless a submission violates basic standards of respectful and lawful participation. This migration has been prepared in the repository but has not been verified on the live database from this workspace.
 
+Public acknowledgements require migration `202609300002_public_acknowledgements.sql`, the updated `submit` function, and the new `contributors` function before the static site is released. Each new form is version 1.1; deploying its static files first would interrupt submissions. The public `/contributors/` page reads only manually approved, opted-in display fields from the new function. It never queries raw tables from the browser.
+
 ## Local preview
 
 Serve the directory over HTTP; ES modules do not run correctly from `file://`.

@@ -1,4 +1,4 @@
-# AI×SD Forms v1.0：实施、数据与上线说明
+# AI×SD Forms v1.1：实施、数据与上线说明
 
 ## 一、先理解记录方式
 
@@ -31,6 +31,8 @@ GitHub Pages 只提供静态页面，**不会替你保存表单回答**。表单
 
 这八步已在当前项目中完成。新的 Contributor 人工确认迁移 `202609300001_contributor_review.sql` 仍需应用到线上数据库并检查；在此之前，表单仍可接收首次贡献，但数据库尚不记录审核状态。若以后迁移到新的 Supabase 项目，需重新执行并测试；只部署 GitHub Pages 不会记录回答。
 
+**v1.1 的 Contributors 页面与公开署名选项仍是代码草案，不能先更新 GitHub Pages。**先应用 `202609300001_contributor_review.sql` 和 `202609300002_public_acknowledgements.sql`，部署新版 `submit` 及新的 `contributors` 函数，验证三表写入与人工审核后，再发布静态页面。否则新版表单提交会失败。
+
 ## 三、共用数据规则
 
 - [`data/taxonomy.js`](../data/taxonomy.js) 统一定义议题、角色、贡献类型和国家代码。数据库存 ID，前端显示英文标签。开始收集后，不要改变已有 ID 的含义。
@@ -55,7 +57,13 @@ GitHub Pages 只提供静态页面，**不会替你保存表单回答**。表单
 
 贡献类型和兴趣议题各最多三项。申请者须完成一个小型首次贡献：指出研究空白（80–200 词）、分享资源并说明价值（说明 50–150 词），或提出小型项目（80–200 词）。资源是 URL 时，URL 单独存储；只提供标题时，标题与说明保存在文本中。个人资料链接最多四个，只接受 HTTP(S)。**提交后先记为待确认；须由项目负责人亲自确认 Contributor 身份。原则上予以确认，仅对违反尊重他人、守法参与等基本规范的提交不予认可。**不自动评分，亦不因此取得组织代表身份或 JOIN 会员身份。
 
-应用 `202609300001_contributor_review.sql` 后，`contributor_interests` 增加 `review_status`（`pending`／`approved`／`declined`）、`reviewed_at` 和仅供内部使用的 `review_note`。新旧记录默认 `pending`。负责人在 Supabase Table Editor 筛选 `pending`，查看首次贡献后亲自将状态改为 `approved` 或 `declined`；数据库自动记录确认时间。成功页只表示提交已收到，不表示已确认。本版不自动发送确认邮件，也没有公开贡献者名录。
+应用 `202609300001_contributor_review.sql` 后，`contributor_interests` 增加 `review_status`（`pending`／`approved`／`declined`）、`reviewed_at` 和仅供内部使用的 `review_note`。新旧记录默认 `pending`。负责人在 Supabase Table Editor 筛选 `pending`，查看首次贡献后亲自将状态改为 `approved` 或 `declined`；数据库自动记录确认时间。成功页只表示提交已收到，不表示已确认。本版不自动发送确认邮件。公开致谢还需要下述单独同意与人工审核。
+
+### Contributors：自愿公开致谢
+
+三张表最后分别询问是否公开致谢：`name`（仅公开姓名）、`name_affiliation`（姓名和机构）、`unlisted`（不公开）。选择公开时另填展示姓名；选择展示机构时另填机构；展示地区可选。咨询后续联系同意、项目公开使用许可和公开姓名的同意彼此独立。旧版回答统一视为 `unlisted`，绝不倒推同意。邮箱、回答正文、项目详情和个人资料链接都不公开；未来若要展示 LinkedIn 或网站，须再次单独同意。
+
+第二个迁移给三张表分别加入公开致谢选择；咨询和项目表另有 `public_listing_status`。任何符合基本表单条件的人都能先提交，不需要预先审核身份。你收到表单后只确认一次：咨询或项目记录改 `public_listing_status`，首次贡献记录改已有的 `review_status`，从 `pending` 改为 `approved` 或 `declined`。若提交者选择公开署名，这次确认后才会在 Contributors 页面出现；若选择不公开，确认后也不会出现。一个人填了不同表，也不进行跨表身份匹配。页面只收到经审核的展示姓名、获同意的机构／地区、贡献类别及月份，不会访问完整回答表。原回答到 12 个月清除后，致谢自动不再返回；可提前把相关状态改为 `declined`，或按隐私说明请求删除。
 
 前端和服务端共用 [`data/validation.js`](../data/validation.js)；服务端在写入前重新验证。文字会去掉控制字符并清理首尾空格。日后若公开展示文字答案，必须按纯文本转义，不能直接当 HTML 插入页面。
 

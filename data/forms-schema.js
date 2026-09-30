@@ -5,6 +5,13 @@ const multi = (name, label, options, required = true, extra = {}) => ({ name, la
 const text = (name, label, required = true, extra = {}) => ({ name, label, type: 'text', required, ...extra });
 const area = (name, label, required = false, extra = {}) => ({ name, label, type: 'textarea', required, ...extra });
 const other = (name, label = 'Please specify') => text(name, label, true, { maxLength: 150, showIfOther: true });
+const acknowledgementFields = () => [
+  choice('public_acknowledgement','Would you like to be acknowledged publicly as a contributor?',[[
+    'name','Yes, list my name'],['name_affiliation','Yes, list my name and affiliation'],['unlisted','No, keep my contribution unlisted']],true,{ hint:'Optional public recognition. Your answer will never make your response, email, or project details public. Listings are checked by a person before publication and can be removed on request.' }),
+  text('public_display_name','Name to display publicly',true,{ maxLength:150, hint:'This exact name may appear on the Contributors page after manual review. Do not enter an email address.', showIf:{ field:'public_acknowledgement', in:['name','name_affiliation'] } }),
+  text('public_affiliation','Affiliation to display publicly',true,{ maxLength:150, showIf:{ field:'public_acknowledgement', in:['name_affiliation'] } }),
+  text('public_region','Country or region to display publicly (optional)',false,{ maxLength:100, showIf:{ field:'public_acknowledgement', in:['name','name_affiliation'] } }),
+];
 
 export const engagement = [
   ['research','Research'], ['coursework','Coursework'], ['project','Project'],
@@ -42,7 +49,7 @@ export const forms = {
     title: 'Youth Consultation on AI & Sustainable Development',
     subtitle: 'Understanding needs, barriers and opportunities for meaningful youth engagement.',
     intro: 'This exploratory consultation seeks to understand how young people engage with AI and sustainable development, what barriers they encounter, and what resources or opportunities would be most useful. Responses may be analysed in aggregate and used to inform a public consultation brief. Individual responses will not be publicly attributed without explicit permission. Participation is voluntary.',
-    duration: '4–6 minutes', version: 'consultation_v1.0',
+    duration: '4–6 minutes', version: 'consultation_v1.1',
     steps: [
       { title: 'About You', fields: [
         choice('has_consented','I have read the information above and agree to participate in this consultation.',[['yes','Yes'],['no','No']],true,{ consent: true }),
@@ -71,13 +78,14 @@ export const forms = {
         { name:'contact_email', label:'Email address', type:'email', required:true, showIf:{ field:'followup_consent', in:['yes'] } },
         text('contact_name','Name or preferred name',false,{ maxLength:150, showIf:{ field:'followup_consent', in:['yes'] } }),
         area('final_comment','Is there anything else this initiative should understand, explore or do differently?',false,{ maxLength:800 }),
+        ...acknowledgementFields(),
       ]},
     ],
   },
   projects: {
     title:'Share a Project or Case', subtitle:'Map work at the intersection of AI and sustainable development.',
     intro:'We are mapping projects, research, tools and practical cases. Submissions may inform future research, case collections or public resources. Submission does not guarantee publication, endorsement or partnership with AI×SD.',
-    duration:'3–5 minutes', version:'projects_v1.0',
+    duration:'3–5 minutes', version:'projects_v1.1',
     steps:[
       { title:'Project', fields:[
         { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
@@ -102,13 +110,14 @@ export const forms = {
         { name:'contact_email', label:'Email address', type:'email', required:true },
         text('organisation','Organisation / team',false,{ maxLength:150 }),
         { name:'submission_confirmed', label:'I confirm that the information is accurate to the best of my knowledge and that I have the right to share any non-public information included here.', type:'checkbox', required:true },
+        ...acknowledgementFields(),
       ]},
     ],
   },
   contribute: {
     title:'Become a YouthAISD Contributor', subtitle:'Make a first contribution and tell us how you could take part in future work.',
     intro:'This form is the first step toward becoming a YouthAISD Contributor. Share a small initial contribution and tell us how you would like to take part. A person reviews each submission before confirming Contributor status. We normally confirm it unless the submission violates basic standards of respectful and lawful participation. Contributor status does not confer a representative role.',
-    duration:'3–5 minutes', version:'contribute_v1.0',
+    duration:'3–5 minutes', version:'contribute_v1.1',
     steps:[
       { title:'About You', fields:[
         { name:'is_adult', label:'I confirm that I am at least 18 years old.', type:'checkbox', required:true },
@@ -133,7 +142,7 @@ export const forms = {
         choice('time_availability','How much time would you realistically be able to contribute?',[['occasional','Occasionally'],['1_2_hours_month','1–2 hours / month'],['2_4_hours_month','2–4 hours / month'],['4_plus_hours_month','4+ hours / month'],['depends_on_project','Depends on the project']]),
         multi('involvement_types','What type of involvement would you prefer?',[['one_off','One-off contribution'],['short_projects','Short projects'],['ongoing_research','Ongoing research'],['review_advisory','Review / advisory work'],['open_to_different','Open to different formats']]),
       ]},
-      { title:'Profile', fields:[{ name:'profile_links', label:'Is there anything you would like us to see?', type:'links', required:false, max:4, kinds:[['orcid','ORCID'],['google_scholar','Google Scholar'],['github','GitHub'],['linkedin','LinkedIn'],['personal_website','Personal website'],['portfolio','Portfolio'],['other','Other']] }]},
+      { title:'Profile', fields:[{ name:'profile_links', label:'Is there anything you would like us to see?', type:'links', required:false, max:4, kinds:[['orcid','ORCID'],['google_scholar','Google Scholar'],['github','GitHub'],['linkedin','LinkedIn'],['personal_website','Personal website'],['portfolio','Portfolio'],['other','Other']] }, ...acknowledgementFields()]},
     ],
   },
 };

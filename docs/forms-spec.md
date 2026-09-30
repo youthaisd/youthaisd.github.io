@@ -1,10 +1,12 @@
-# AI×SD Forms v1.0 — implementation and analysis specification
+# AI×SD Forms v1.1 — implementation and analysis specification
 
 ## Status and deployment boundary
 
 The LISTEN, MAP, and CONTRIBUTE forms and Supabase backend are deployed for live submissions. A separate JOIN prototype is paused and not promoted on the public site; see [membership notes](membership-v02.md). The three forms are restricted to adults aged 18 or older. The browser contains only a publishable key; the success pages show confirmation and a deletion-request reference only after an accepted API response.
 
 The new Contributor review migration is prepared but still needs to be applied and checked against the live database. Until then, the public form can receive first contributions, but its review status is not tracked in the table.
+
+The v1.1 public acknowledgement changes are prepared in code only. Deploy the review migration and acknowledgement migration, then both Edge Functions, test, and only then publish the updated static site. Publishing the v1.1 forms first would make live submissions fail.
 
 Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `contribute/`, each with `success/` (and a `success.html` equivalent). All asset links are relative and work under a repository path.
 
@@ -23,9 +25,9 @@ Routes on GitHub Pages use the site directory: `consultation/`, `projects/`, `co
 
 | Form | Table | Version | Main analysis fields | Personal contact fields |
 |---|---|---|---|---|
-| LISTEN | `consultation_responses` | `consultation_v1.0` | country, role, interest topics, familiarity, engagement, top barriers, desired resources, ideal solution, future priorities, willingness to contribute | follow-up email/name only when consented |
-| MAP | `project_submissions` | `projects_v1.0` | project type/stage/region/topics/SDGs, problem, AI role, progress, links, needs, public-use permission | submitter name/email/organisation |
-| CONTRIBUTE | `contributor_interests` | `contribute_v1.0` | role, field, topics, contribution types, small first contribution, availability, profile links | preferred name/email |
+| LISTEN | `consultation_responses` | `consultation_v1.1` | country, role, interest topics, familiarity, engagement, top barriers, desired resources, ideal solution, future priorities, willingness to contribute | follow-up email/name only when consented; separate display name if public acknowledgement chosen |
+| MAP | `project_submissions` | `projects_v1.1` | project type/stage/region/topics/SDGs, problem, AI role, progress, links, needs, public-use permission | submitter name/email/organisation |
+| CONTRIBUTE | `contributor_interests` | `contribute_v1.1` | role, field, topics, contribution types, small first contribution, availability, profile links | preferred name/email |
 
 Each table also stores its own UUID, creation time, source, form version, and adult confirmation. There is no shared `person_id`. The SQL migrations revoke `anon` and `authenticated` access to all response tables and grant the service role access for verified data requests. The Edge Function uses the admin client only on the server.
 
@@ -43,7 +45,15 @@ Title is at most 150 characters. The project stage changes the progress question
 
 Contribution types and topics allow up to three. A small first contribution is required: gap (80–200 words), resource (title or URL plus 50–150-word explanation), or small project (80–200 words). Resource titles and explanations are joined in `micro_contribution_text`; a web URL, when provided, is stored separately in `micro_contribution_url`. There is no automatic scoring or approval. An authorized person normally confirms Contributor status after reading the first contribution, declining only submissions that violate basic standards of respectful and lawful participation. Profile links allow up to four HTTP(S) URLs.
 
-The review migration `202609300001_contributor_review.sql` adds `review_status` (`pending`, `approved`, `declined`), `reviewed_at`, and a private `review_note` to `contributor_interests`. New and existing records start as `pending`. The public success page confirms receipt only. In Supabase Table Editor, the authorized reviewer filters this table to `pending`, reads the first contribution, and changes `review_status` to `approved` or `declined`; the trigger stamps `reviewed_at`. The dashboard review is the required personal confirmation. Do not present a pending row as an approved Contributor, and do not publish contact details. This release has no automatic approval email or public Contributor directory.
+The review migration `202609300001_contributor_review.sql` adds `review_status` (`pending`, `approved`, `declined`), `reviewed_at`, and a private `review_note` to `contributor_interests`. New and existing records start as `pending`. The public success page confirms receipt only. In Supabase Table Editor, the authorized reviewer filters this table to `pending`, reads the first contribution, and changes `review_status` to `approved` or `declined`; the trigger stamps `reviewed_at`. The dashboard review is the required personal confirmation. Do not present a pending row as an approved Contributor, and do not publish contact details. This release has no automatic approval email.
+
+### Public acknowledgements
+
+Each form ends with a separate choice: `name`, `name_affiliation`, or `unlisted`. A display name is required for either public choice; affiliation is required only for `name_affiliation`; region is optional. Neither follow-up consent nor project public-use permission implies a public name listing. Public display does not include answer text, project details, email, or profile links. Existing v1.0 rows default to `unlisted`; no consent is inferred retroactively.
+
+Migration `202609300002_public_acknowledgements.sql` adds the display fields to all three tables. Consultation and project rows also receive `public_listing_status`: the submit function sets opted-in rows to `pending`, unlisted rows to `unlisted`. The reviewer checks the received submission and consent once, then changes that status to `approved` or `declined`. Contributor rows use the existing `review_status` for the same single manual decision. Any eligible adult can submit; no identity pre-approval is required. For a Contributor row that opted in, the one `review_status = approved` confirmation also makes the acknowledgement visible. No status change is automatic.
+
+The `contributors` Edge Function returns only approved display name, approved affiliation/region, and source type plus month. It never returns email, response ID, or answer text. It reads the three tables separately and does not match people across them. The public page renders returned text via `textContent`. A listing drops from the endpoint when the source row is deleted or passes the 12-month retention limit; a reviewer can remove it sooner by setting the relevant review status to `declined`. Do not publish profile URLs until a separate link-specific consent process exists.
 
 Client and server both use `data/validation.js`; the server validates again before insertion. Text is trimmed and control characters removed. Links accept only HTTP(S). Text from submissions must remain plain text in any future public rendering and must never be inserted as raw HTML.
 
@@ -66,11 +76,11 @@ For project mapping, summarize topics × stage, topics × needs, and stage × ne
 ## Launch checklist
 
 1. Create a Supabase project and apply all migrations in `supabase/migrations/` in order.
-2. Link the project with the Supabase CLI, apply the migration (`supabase db push`), and deploy `supabase/functions/submit` (`supabase functions deploy submit`). `verify_jwt = false` is in `supabase/config.toml`; the function itself requires a valid publishable key.
+2. Link the project with the Supabase CLI, apply the migrations (`supabase db push`), and deploy `supabase/functions/submit` and `supabase/functions/contributors`. `verify_jwt = false` is in `supabase/config.toml`; both functions require a valid publishable key.
 3. Set `PUBLIC_SITE_ORIGINS` (comma-separated exact origins, e.g. `https://example.org`) and `RATE_LIMIT_SALT` in Supabase Secrets. Verify gateway IP header behavior.
 4. Publish a privacy notice naming the responsible contact, storage location, retention period, withdrawal/deletion process, and intended research/publication use.
 5. In `assets/js/api-config.js`, set the public Edge Function URL and the Supabase **publishable** key. Never paste a secret/service-role key here.
-6. Test all three forms against the deployed function; confirm accepted rows land in different tables and direct `anon`/`authenticated` table reads are denied. Test negative cases, rate limit, and origin rejection.
+6. Test all three v1.1 forms against the deployed function; confirm accepted rows land in different tables and direct `anon`/`authenticated` table reads are denied. Test all three acknowledgement choices, conditional display fields, negative cases, rate limit, and origin rejection. Confirm the public endpoint returns no pending, unlisted, declined, expired, or unconfirmed Contributor records. Confirm a manually approved listing appears and disappears after reversal.
 7. Publish the static directory to GitHub Pages after the checks pass.
 
 Current [Supabase Edge Function auth](https://supabase.com/docs/guides/functions/auth), [CORS](https://supabase.com/docs/guides/functions/cors), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), and [API key](https://supabase.com/docs/guides/getting-started/api-keys) documentation informed the server setup.

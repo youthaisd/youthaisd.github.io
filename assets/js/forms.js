@@ -66,6 +66,7 @@ function renderChoice(field, wrapper) {
   const legend = el('legend','field-label',field.label);
   if (field.required) legend.append(el('span','required-mark',' *'));
   group.append(legend);
+  if (field.hint) group.append(el('p','field-hint',field.hint));
   const selected = state.values[field.name];
   const grid = el('div','choice-options');
   for (const [id, label] of field.options) {
@@ -146,6 +147,7 @@ function renderSimple(field, wrapper) {
   const refreshCount = () => { if (count) count.textContent = field.maxLength ? `${input.value.length} / ${field.maxLength} characters` : `${wordCount(input.value)} / ${field.maxWords} words`; };
   input.addEventListener('input',() => { markChanged(field.name,input.value); refreshCount(); });
   label.append(input); wrapper.append(label);
+  if (field.hint) wrapper.append(el('p','field-hint',field.hint));
   if (count) { refreshCount(); wrapper.append(count); }
 }
 function renderField(field) {

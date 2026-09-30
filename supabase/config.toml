@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.join]
 verify_jwt = false
+
+[functions.contributors]
+verify_jwt = false

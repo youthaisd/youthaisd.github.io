@@ -55,6 +55,13 @@ export function normalizeAndValidate(formName, raw, stepIndex = null) {
     }
   }
   if (stepIndex === null) {
+    if (values.public_acknowledgement === 'unlisted') {
+      values.public_display_name = null;
+      values.public_affiliation = null;
+      values.public_region = null;
+    } else if (values.public_acknowledgement === 'name') {
+      values.public_affiliation = null;
+    }
     if (formName === 'consultation') {
       if (values.has_consented !== 'yes') errors.has_consented = 'Consent is required to participate.';
       values.has_consented = values.has_consented === 'yes';
